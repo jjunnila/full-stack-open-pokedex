@@ -30,21 +30,19 @@ jobs:
         if: ${{ env.CONDITION == 'true' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       - name: Discord Webhook Notify Success
-        uses: rjstone/discord-webhook-notify@v1.0.2
+        env: 
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.3.2
         if: success()
         with:
-            severity: info
-            text: A new version of Pokedex deployed
-            description: to https://full-stack-open-pokedex-jjunnila.onrender.com/ by ${{ github.event.head_commit.committer.username }}
-            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+            args: 'A new version of Pokedex deployed to https://full-stack-open-pokedex-jjunnila.onrender.com/ by ${{ github.event.head_commit.committer.username }}'
       - name: Discord Webhook Notify Failure
-        uses: rjstone/discord-webhook-notify@v1.0.2
+        env: 
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@0.3.2
         if: failure()
         with:
-            severity: error
-            text: Build failed!
-            description: commit ${{ github.event.head_commit.url }} by ${{ github.event.head_commit.committer.username }} broke the build :(
-            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+            args: 'Build failed! Commit ${{ github.event.head_commit.url }} by ${{ github.event.head_commit.committer.username }} broke the build :('
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-20.04
